@@ -1,8 +1,7 @@
 <?php
 session_start();
-include("constant.php");
+include("includes/constant.php"); // keep consistent with your folder structure
 
-// Check if form submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
@@ -18,10 +17,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        die("Database connection failed: " . $conn->connect_error);
     }
 
-    // Prepare statement
+    // Prepare query
     $stmt = $conn->prepare("SELECT id, full_name, password FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -34,8 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verify password
         if (password_verify($password, $hashed_password)) {
             $_SESSION['user_id'] = $id;
-            $_SESSION['full_name'] = $full_name;
-            header("Location: dashboard.php"); // Redirect to dashboard
+            $_SESSION['user_name'] = $full_name; // ✅ match dashboard.php
+            header("Location: dashboard.php");
             exit();
         } else {
             $_SESSION['error'] = "Invalid email or password.";
